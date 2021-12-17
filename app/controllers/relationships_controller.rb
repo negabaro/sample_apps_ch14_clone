@@ -3,7 +3,13 @@ class RelationshipsController < ApplicationController
 
   def create
     @user = User.find(params[:followed_id])
-    current_user.follow(@user)
+
+    ActiveRecord::Base.transaction do
+      current_user.follow(@user)
+    rescue StandardError
+      Rails.logger.debug("error: #{e}")
+    end
+
     respond_to do |format|
       format.html { redirect_to @user }
       format.js

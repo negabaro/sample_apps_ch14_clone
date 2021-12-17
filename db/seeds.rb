@@ -1,3 +1,5 @@
+require 'active_support/testing/time_helpers'
+include ActiveSupport::Testing::TimeHelpers
 # ユーザー
 User.create!(name:  "Example User",
     email: "example@railstutorial.org",
@@ -29,7 +31,36 @@ end
 # 以下のリレーションシップを作成する
 users = User.all
 user  = users.first
+user.create_notice('初回ログインありがとうございます。', 'first_login')
 following = users[2..50]
-followers = users[3..40]
-following.each { |followed| user.follow(followed) }
-followers.each { |follower| follower.follow(user) }
+
+followers = users[3..14]
+followers2 = users[15..19]
+followers3 = users[20..36]
+followers4 = users[37..40]
+
+following.each do |followed|
+  user.follow(followed)
+end
+
+followers.each do |follower|
+  follower.follow(user)
+end
+
+travel_to 5.minutes.after do
+  followers2.each do |follower|
+    follower.follow(user)
+  end
+end
+
+travel_to 15.minutes.after do
+  followers3.each do |follower|
+    follower.follow(user)
+  end
+end
+
+travel_to 20.minutes.after do
+  followers4.each do |follower|
+    follower.follow(user)
+  end
+end

@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  has_many :notices, dependent: :destroy
   has_many :microposts, dependent: :destroy
   has_many :active_relationships, class_name:  "Relationship",
                                   foreign_key: "follower_id",
@@ -88,6 +89,8 @@ class User < ApplicationRecord
 
   # ユーザーをフォローする
   def follow(other_user)
+    message = "#{other_user.name}さんにフォローされました"
+    other_user.create_notice(message, 'follow')
     following << other_user
   end
 
@@ -99,6 +102,16 @@ class User < ApplicationRecord
   # 現在のユーザーがフォローしてたらtrueを返す
   def following?(other_user)
     following.include?(other_user)
+  end
+
+  def create_notice(message, notice_type)
+    notices.create(message: message, notice_type: notice_type)
+  end
+
+  def notice_list
+    # rubocop:disable Layout/LineLength
+    notices.group(:notice_type).group_by_minute(:created_at, n: 5).select('COUNT(*)as count_all, message, notice_type').order(:created_at).map { |f| f.notice_type == 'follow' ? f.message.sub!(/にフォローされました/, "他#{f.count_all - 1}名にフォローされました") : f.message }
+    # rubocop:enable Layout/LineLength
   end
 
   private

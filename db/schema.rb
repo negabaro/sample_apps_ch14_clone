@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_18_073601) do
+ActiveRecord::Schema.define(version: 2021_12_17_114320) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -42,6 +42,16 @@ ActiveRecord::Schema.define(version: 2020_02_18_073601) do
     t.index ["user_id"], name: "index_microposts_on_user_id"
   end
 
+  create_table "notices", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "message"
+    t.integer "notice_type"
+    t.boolean "unread", default: true
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_notices_on_user_id"
+  end
+
   create_table "relationships", force: :cascade do |t|
     t.integer "follower_id"
     t.integer "followed_id"
@@ -65,9 +75,11 @@ ActiveRecord::Schema.define(version: 2020_02_18_073601) do
     t.datetime "activated_at"
     t.string "reset_digest"
     t.datetime "reset_sent_at"
+    t.integer "sign_in_count", default: 0
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "microposts", "users"
+  add_foreign_key "notices", "users"
 end
